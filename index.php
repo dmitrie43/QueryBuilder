@@ -20,7 +20,10 @@ session_start();
 $queryBuilder = new Db;
 $arr = [
     'name' => 'Dmitry',
+    'lastname' => 'Efimov',
+    'age' => 20,
 ];
 //$queryBuilder->insert('users', $arr);
-//$queryBuilder->delete('users')->where('name', '=','Toy');
+//$queryBuilder->delete('users')->where('name', '=','Dmitry');
+$queryBuilder->update('users', $arr)->where('id','<','60');
 $queryBuilder->execute();

@@ -76,6 +76,15 @@ class Db
         }
     }
 
+    public function update($table, $list) {
+        $uplist = '';
+        foreach ($list as $key => $value) {
+            $uplist .= "$key = '$value'".",";
+        }
+        $uplist = rtrim($uplist, ',');
+        $this->sql = "UPDATE $table SET $uplist";
+        return $this;
+    }
 
 
 //    public function viewAll($sql, $params = []) {
