@@ -11,7 +11,7 @@ class Db
     protected $where;
     protected $limit;
     protected $orderBy;
-    protected $fields = [];
+//    protected $fields = [];
 
     public function __construct() {
         $config = require 'application/config/db.php';
@@ -28,7 +28,7 @@ class Db
         $stmt = $this->db->prepare($sql);
         if (!empty($params)) {
             foreach ($params as $key => $value) {
-                $stmt->bindValue(':'.$key, $value);
+                $stmt->bindValue(":$key", $value);
             }
         }
         $stmt->execute();
@@ -37,7 +37,6 @@ class Db
 
     public function execute() {
         $result = $this->sql.$this->where.$this->orderBy.$this->limit;
-        debug($result);
         $stmt = $this->db->prepare($result);
         $stmt->execute();
         return $stmt;
@@ -48,16 +47,8 @@ class Db
     }
 
     public function insert($table, $list) {
-        $field_list = '';
-        $value_list = '';
-        foreach ($list as $k => $v) {
-//            if (in_array($k, $this->fields)) {
-                $field_list .= $k . ',';
-                $value_list .= "'" . $v . "'" . ',';
-//            }
-        }
-        $field_list = rtrim($field_list, ',');
-        $value_list = rtrim($value_list, ',');
+        $field_list = implode(',', array_keys($list));
+        $value_list = implode(',', array_map(function($value){return var_export($value, true);}, array_values($list)));
         $sql = "INSERT INTO {$table} ({$field_list}) VALUES ($value_list)";
         $this->setSql($sql);
     }
@@ -68,29 +59,22 @@ class Db
         return $this;
     }
 
-    public function where($value1 = [], $cond = [], $value2 = []) {
-        if (!empty($value1) && !empty($cond) && !empty($value2)) {
-            if ($this->checkCondition($cond) == true) {
-                $where = rtrim(" WHERE $value1 $cond \"$value2\"");
-                $this->where = $where;
-                return $this;
-            } else {
-                exit('Знак в WHERE неверен');
-            }
-        } else {
+    public function where($column = '', $cond = '', $value = '') {
+        if (empty($column) && empty($cond) && empty($value)) {
             exit('WHERE не полное');
+        }
+        if ($this->checkCondition($cond)) {
+            $where = rtrim(" WHERE $column $cond \"$value\"");
+            $this->where = $where;
+            return $this;
+        } else {
+            exit('Знак в WHERE неверен');
         }
     }
     //Проверка на правильность ввода знака
     private function checkCondition($code) {
-        $flag = false;
-        $array = [60, 61, 62, 242, 243];
-        foreach ($array as $value) {
-            if (ord($code) == $value) {
-                $flag = true;
-            }
-        }
-        return $flag;
+        $array = ['=', '>', '<', '<=', '>='];
+        return in_array($code, $array);
     }
 
     public function update($table, $list) {
@@ -105,21 +89,16 @@ class Db
     }
 
     public function limit($num) {
-        if ($num > 0) {
-            $limit = rtrim(" LIMIT $num");
-            $this->limit = $limit;
-            return $this;
-        } else {
-            exit('LIMIT должен быть цифрой больше 0');
+        if ($num < 0) {
+            exit('LIMIT должен быть цифрой больше и равен нулю');
         }
+        $limit = rtrim(" LIMIT $num");
+        $this->limit = $limit;
+        return $this;
     }
 
     public function select($list, $table) {
-        $fields = '';
-        foreach ($list as $value) {
-            $fields .= "$value,";
-        }
-        $fields = rtrim($fields, ',');
+        $fields = " '".implode(" ','", $list). "' ";
         $sql = "SELECT $fields FROM $table";
         $this->setSql($sql);
         return $this;
@@ -141,11 +120,7 @@ class Db
     }
     //Проверка на правильность ввода ASC, DESC
     private function checkOrder($order) {
-        $flag = false;
-        if ($order == 'ASC' || $order == 'DESC') {
-            $flag = true;
-        }
-        return $flag;
+        return ($order == 'ASC' || $order == 'DESC');
     }
 
 
