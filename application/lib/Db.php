@@ -36,7 +36,7 @@ class Db
 
     public function execute() {
         $result = $this->sql.$this->where.$this->limit;
-//        debug($result);
+        debug($result);
         $stmt = $this->db->prepare($result);
         $stmt->execute();
         return $stmt;
@@ -69,12 +69,27 @@ class Db
 
     public function where($value1 = [], $cond = [], $value2 = []) {
         if (!empty($value1) && !empty($cond) && !empty($value2)) {
-            $where = rtrim(" WHERE $value1 $cond \"$value2\"");
-            $this->where = $where;
-            return $this;
+            if ($this->checkCondition($cond) == true) {
+                $where = rtrim(" WHERE $value1 $cond \"$value2\"");
+                $this->where = $where;
+                return $this;
+            } else {
+                exit('Знак в WHERE неверен');
+            }
         } else {
             exit('WHERE не полное');
         }
+    }
+
+    private function checkCondition($code) {
+        $flag = false;
+        $array = [60, 61, 62, 242, 243];
+        foreach ($array as $value) {
+            if (ord($code) == $value) {
+                $flag = true;
+            }
+        }
+        return $flag;
     }
 
     public function update($table, $list) {
@@ -96,6 +111,17 @@ class Db
         } else {
             exit('LIMIT должен быть больше 0');
         }
+    }
+
+    public function select($list, $table) {
+        $fields = '';
+        foreach ($list as $value) {
+            $fields .= "$value,";
+        }
+        $fields = rtrim($fields, ',');
+        $sql = "SELECT $fields FROM $table";
+        $this->setSql($sql);
+        return $this;
     }
 
 
