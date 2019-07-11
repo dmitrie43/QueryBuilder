@@ -10,6 +10,7 @@ class Db
     protected $sql;
     protected $where;
     protected $limit;
+    protected $orderBy;
     protected $fields = [];
 
     public function __construct() {
@@ -35,7 +36,7 @@ class Db
     }
 
     public function execute() {
-        $result = $this->sql.$this->where.$this->limit;
+        $result = $this->sql.$this->where.$this->orderBy.$this->limit;
         debug($result);
         $stmt = $this->db->prepare($result);
         $stmt->execute();
@@ -80,7 +81,7 @@ class Db
             exit('WHERE не полное');
         }
     }
-
+    //Проверка на правильность ввода знака
     private function checkCondition($code) {
         $flag = false;
         $array = [60, 61, 62, 242, 243];
@@ -109,7 +110,7 @@ class Db
             $this->limit = $limit;
             return $this;
         } else {
-            exit('LIMIT должен быть больше 0');
+            exit('LIMIT должен быть цифрой больше 0');
         }
     }
 
@@ -122,6 +123,29 @@ class Db
         $sql = "SELECT $fields FROM $table";
         $this->setSql($sql);
         return $this;
+    }
+
+    public function orderBy($list, $order) {
+        $fields = '';
+        if ($this->checkOrder($order) == true) {
+            foreach ($list as $value) {
+                $fields .= "$value,";
+            }
+            $fields = rtrim($fields, ',');
+            $orderBy = rtrim(" ORDER BY $fields $order");
+            $this->orderBy = $orderBy;
+            return $this;
+        } else {
+            exit('Неверная сортировка');
+        }
+    }
+    //Проверка на правильность ввода ASC, DESC
+    private function checkOrder($order) {
+        $flag = false;
+        if ($order == 'ASC' || $order == 'DESC') {
+            $flag = true;
+        }
+        return $flag;
     }
 
 
