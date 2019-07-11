@@ -9,6 +9,7 @@ class Db
     protected $db;
     protected $sql;
     protected $where;
+    protected $limit;
     protected $fields = [];
 
     public function __construct() {
@@ -34,7 +35,7 @@ class Db
     }
 
     public function execute() {
-        $result = $this->sql.$this->where;
+        $result = $this->sql.$this->where.$this->limit;
 //        debug($result);
         $stmt = $this->db->prepare($result);
         $stmt->execute();
@@ -72,7 +73,7 @@ class Db
             $this->where = $where;
             return $this;
         } else {
-            exit('Условие не полное');
+            exit('WHERE не полное');
         }
     }
 
@@ -82,8 +83,19 @@ class Db
             $uplist .= "$key = '$value'".",";
         }
         $uplist = rtrim($uplist, ',');
-        $this->sql = "UPDATE $table SET $uplist";
+        $sql = "UPDATE $table SET $uplist";
+        $this->setSql($sql);
         return $this;
+    }
+
+    public function limit($num) {
+        if ($num > 0) {
+            $limit = rtrim(" LIMIT $num");
+            $this->limit = $limit;
+            return $this;
+        } else {
+            exit('LIMIT должен быть больше 0');
+        }
     }
 
 

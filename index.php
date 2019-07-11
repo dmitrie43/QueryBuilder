@@ -24,6 +24,6 @@ $arr = [
     'age' => 20,
 ];
 //$queryBuilder->insert('users', $arr);
-//$queryBuilder->delete('users')->where('name', '=','Dmitry');
-$queryBuilder->update('users', $arr)->where('id','<','60');
+$queryBuilder->delete('users')->where('name', '=','Dmitry')->limit(2);
+//$queryBuilder->update('users', $arr)->where('id','<','60');
 $queryBuilder->execute();
