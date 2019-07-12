@@ -2,44 +2,19 @@
 
 namespace application\lib;
 
-use PDO;
+use application\lib\Connect;
 
-class Db
+class QueryBuilder extends Connect
 {
-    protected $db;
     protected $sql;
     protected $where;
     protected $limit;
     protected $orderBy;
-//    protected $fields = [];
 
-    public function __construct() {
-        $config = require 'application/config/db.php';
-        $this->db = new PDO('mysql:host='.$config['host'].';dbname='.$config['name'].'', $config['user'], $config['password']);
-
-//        $this->getFields();
-    }
-
-//    public function getFields() {
-//        $sql = "DESC ". $this->table;
-//    }
-
-    public function query($sql, $params = []) {
-        $stmt = $this->db->prepare($sql);
-        if (!empty($params)) {
-            foreach ($params as $key => $value) {
-                $stmt->bindValue(":$key", $value);
-            }
-        }
-        $stmt->execute();
-        return $stmt;
-    }
-
-    public function execute() {
+    public function execute()
+    {
         $result = $this->sql.$this->where.$this->orderBy.$this->limit;
-        $stmt = $this->db->prepare($result);
-        $stmt->execute();
-        return $stmt;
+        return parent::prepared($result);
     }
 
     private function setSql($sql) {

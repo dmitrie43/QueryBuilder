@@ -2,7 +2,7 @@
 
 require 'application/lib/Dev.php';
 
-use application\lib\Db;
+use application\lib\QueryBuilder;
 
 spl_autoload_register(function($class) {
     $path = str_replace('\\', DIRECTORY_SEPARATOR, $class.'.php');
@@ -17,7 +17,7 @@ session_start();
 //            'name' => 'Дмитрий',
 //        ];
 
-$queryBuilder = new Db;
+$queryBuilder = new QueryBuilder;
 $arr = [
     'name' => 'Dmitry',
     'lastname' => 'Efimov',
