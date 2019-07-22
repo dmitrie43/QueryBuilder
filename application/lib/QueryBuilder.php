@@ -4,7 +4,7 @@ namespace application\lib;
 
 use application\lib\Connect;
 
-class QueryBuilder extends Connect
+class QueryBuilder
 {
     protected $sql;
     protected $where;
@@ -14,7 +14,8 @@ class QueryBuilder extends Connect
     public function execute()
     {
         $result = $this->sql.$this->where.$this->orderBy.$this->limit;
-        return parent::prepared($result);
+        $this->connect = new Connect();
+        return $this->connect->query($result);
     }
 
     private function setSql($sql) {
