@@ -11,10 +11,13 @@ class QueryBuilder
     protected $limit;
     protected $orderBy;
 
+    public function __construct() {
+    	$this->connect = new Connect();
+    }
+
     public function execute()
     {
         $result = $this->sql.$this->where.$this->orderBy.$this->limit;
-        $this->connect = new Connect();
         return $this->connect->query($result);
     }
 
