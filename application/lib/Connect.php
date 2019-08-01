@@ -3,14 +3,16 @@
 namespace application\lib;
 
 use PDO;
+use application\lib\BuilderFactory;
 
 class Connect
 {
     private $db;
 
     public function __construct() {
+        $dbms = new BuilderFactory();
         $config = require 'application/config/db.php';
-        $this->db = new PDO('mysql:host='.$config['host'].';dbname='.$config['name'].'', $config['user'], $config['password']);
+        $this->db = new PDO($dbms->getDbms().':host='.$config['host'].';dbname='.$config['name'].'', $config['user'], $config['password']);
     }
 
     public function query($sql, $params = []) {

@@ -2,27 +2,39 @@
 
 namespace application\lib;
 
+use application\dbms\MysqlBuilder;
+use application\dbms\PgBuilder;
 use application\lib\Connect;
 
-class QueryBuilder
+abstract class QueryBuilder
 {
     protected $sql;
     protected $where;
     protected $limit;
     protected $orderBy;
+    private $connect;
+
+    abstract protected function wrap($sql);
 
     public function __construct() {
     	$this->connect = new Connect();
     }
 
-    public function execute()
-    {
-        $result = $this->sql.$this->where.$this->orderBy.$this->limit;
+    public function execute() {
+        $res = $this->sql.$this->where.$this->orderBy.$this->limit;
+        $dbms = new BuilderFactory();
+        $result = '';
+        switch ($dbms->getDbms()) {
+            case $dbms->mysql:
+                $db = new MysqlBuilder();
+                $result = $db->wrap($res);
+                break;
+            case $dbms->pg:
+                $db = new PgBuilder();
+                $result = $db->wrap($res);
+                break;
+        }
         return $this->connect->query($result);
-    }
-
-    private function setSql($sql) {
-        $this->sql = $sql;
     }
 
     public function insert($table, $list) {
@@ -102,14 +114,7 @@ class QueryBuilder
         return ($order == 'ASC' || $order == 'DESC');
     }
 
-
-//    public function viewAll($sql, $params = []) {
-//        $result = $this->query($sql, $params);
-//        return $result->fetchAll(PDO::FETCH_ASSOC);
-//    }
-//
-//    public function column($sql, $params = []) {
-//        $result = $this->query($sql, $params);
-//        return $result->fetchColumn();
-//    }
+    private function setSql($sql) {
+        $this->sql = $sql;
+    }
 }
