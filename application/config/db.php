@@ -5,7 +5,7 @@ return [
     'name' => 'builder',
     'password' => '',
     'user' => 'root',
-    'dbms' => 'Mysql',
+    'dbms' => 'Mysqli',
 ];
 
 //dbms => MySql || PgSql
