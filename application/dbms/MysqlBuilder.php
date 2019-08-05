@@ -12,7 +12,7 @@ use application\lib\QueryBuilder;
 
 class MysqlBuilder extends QueryBuilder
 {
-    public function wrap($sql) {
-        return str_replace('`','\'', $sql);
+    public function wrap($name) {
+        return "'$name'";
     }
 }
