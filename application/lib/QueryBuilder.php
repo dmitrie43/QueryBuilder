@@ -52,10 +52,11 @@ abstract class QueryBuilder
         }
     }
 
-    public function where($column = '', $cond = '=', $value = '') {
+    public function where($column = '', $cond = '', $value = '') {
         $this->checkWhere($column, $cond, $value);
         $wrapped = $this->wrap($column);
-        $where = rtrim(" WHERE $wrapped $cond \"$value\"");
+        $value = var_export($value, true);
+        $where = rtrim(" WHERE $wrapped $cond $value");
         $this->where = $where;
         return $this;
     }
