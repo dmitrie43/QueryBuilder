@@ -11,10 +11,9 @@ class Connect
     private $db;
 
     public function __construct() {
-        $dbms = new BuilderFactory();
         $config = require 'application/config/db.php';
         try {
-            $this->db = new PDO($dbms->getDbms().':host='.$config['host'].';dbname='.$config['name'].'', $config['user'], $config['password']);
+            $this->db = new PDO($config['driver'].':host='.$config['host'].';dbname='.$config['name'].'', $config['user'], $config['password']);
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             exit('Подключение не удалось: '. $e->getMessage());

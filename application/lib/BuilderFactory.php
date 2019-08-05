@@ -8,29 +8,31 @@
 
 namespace application\lib;
 
+use Exception;
+
 class BuilderFactory
 {
-    protected $dbms;
+    protected $driver;
     public $mysql = 'mysql';
     public $pg = 'pgsql';
 
     public function __construct() {
         $config = require 'application/config/db.php';
-        $dbms = strtolower($config['dbms']);
-        switch ($dbms) {
+        $driver = strtolower($config['driver']);
+        switch ($driver) {
             case $this->mysql:
-                $this->dbms = $this->mysql;
+                $this->driver = $this->mysql;
                 break;
             case $this->pg:
-                $this->dbms = $this->pg; //Для записи в pdo
+                $this->driver = $this->pg;
                 break;
             default:
-                return false;
+                new Exception('Неизвестный тип подключения');
         }
     }
 
-    public function getDbms()
+    public function getDriver()
     {
-        return $this->dbms;
+        return $this->driver;
     }
 }

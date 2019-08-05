@@ -12,29 +12,21 @@ abstract class QueryBuilder
     protected $where;
     protected $limit;
     protected $orderBy;
-    private $connect;
+    protected $connect;
+    protected $wrapped;
+    protected $andWhere;
+    protected $orWhere;
 
-    abstract protected function wrap($sql);
+    abstract protected function wrap($name);
 
     public function __construct() {
     	$this->connect = new Connect();
     }
 
     public function execute() {
-        $res = $this->sql.$this->where.$this->orderBy.$this->limit;
-        $dbms = new BuilderFactory();
-        $result = '';
-        switch ($dbms->getDbms()) {
-            case $dbms->mysql:
-                $db = new MysqlBuilder();
-                $result = $db->wrap($res);
-                break;
-            case $dbms->pg:
-                $db = new PgBuilder();
-                $result = $db->wrap($res);
-                break;
-        }
-        return $this->connect->query($result);
+        $res = $this->sql.$this->where.$this->andWhere.$this->orWhere.$this->orderBy.$this->limit;
+        var_dump($res);
+        return $this->connect->query($res);
     }
 
     public function insert($table, $list) {
@@ -49,19 +41,58 @@ abstract class QueryBuilder
         $this->setSql($sql);
         return $this;
     }
-
-    public function where($column = '', $cond = '', $value = '') {
-        if (empty($column) && empty($cond) && empty($value)) {
+    //Проверка условия
+    private function checkWhere($column, $cond, $value) {
+        if (empty($column) || empty($cond) || empty($value)) {
             exit('WHERE не полное');
         }
         if ($this->checkCondition($cond)) {
-            $where = rtrim(" WHERE $column $cond \"$value\"");
-            $this->where = $where;
-            return $this;
+            return;
         } else {
             exit('Знак в WHERE неверен');
         }
     }
+    //Проверка драйвера
+    private function checkDriver($column) {
+        $driver = new BuilderFactory();
+        $wrapped = '';
+        switch ($driver->getDriver()) {
+            case $driver->mysql:
+                $db = new MysqlBuilder();
+                $wrapped = $db->wrap($column);
+                break;
+            case $driver->pg:
+                $db = new PgBuilder();
+                $wrapped = $db->wrap($column);
+                break;
+        }
+        $this->wrapped = $wrapped;
+    }
+
+    public function where($column = '', $cond = '=', $value = '') {
+        $this->checkWhere($column, $cond, $value);
+        $this->checkDriver($column);
+        $where = rtrim(" WHERE $this->wrapped $cond \"$value\"");
+        $this->where = $where;
+        return $this;
+    }
+
+    public function andWhere($column = '', $cond = '', $value = '') {
+        $this->checkWhere($column, $cond, $value);
+        $this->checkDriver($column);
+        $where = rtrim(" AND $this->wrapped $cond \"$value\"");
+        $this->andWhere = $where;
+        return $this;
+    }
+
+    public function orWhere($column = '', $cond = '', $value = '') {
+        $this->checkWhere($column, $cond, $value);
+        $this->checkDriver($column);
+        $where = rtrim(" OR $this->wrapped $cond \"$value\"");
+        $this->orWhere = $where;
+        return $this;
+    }
+
     //Проверка на правильность ввода знака
     private function checkCondition($code) {
         $array = ['=', '>', '<', '<=', '>='];

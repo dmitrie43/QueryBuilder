@@ -14,19 +14,21 @@ spl_autoload_register(function($class) {
 session_start();
 
 $Qb = new \application\dbms\MysqlBuilder();
-
-
+//$arr = [
+//    'name' => 'Dmitry',
+//    'lastname' => 'Efimov',
+//    'age' => 19,
+//];
+//$Qb->insert('users', $arr);
+//$Qb->delete('users')->where('age','=','20')->orWhere('age', '=', '19');
+//$Qb->execute();
 
 //$params = [
 //            'name' => 'Дмитрий',
 //        ];
 
 //$queryBuilder = new QueryBuilder;
-//$arr = [
-//    'name' => 'Dmitry',
-//    'lastname' => 'Efimov',
-//    'age' => 20,
-//];
+
 //$arr2 = [
 //    'name', 'lastname'
 //];

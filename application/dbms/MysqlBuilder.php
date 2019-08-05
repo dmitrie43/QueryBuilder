@@ -13,6 +13,6 @@ use application\lib\QueryBuilder;
 class MysqlBuilder extends QueryBuilder
 {
     public function wrap($name) {
-        return "'$name'";
+        return $name;
     }
 }
