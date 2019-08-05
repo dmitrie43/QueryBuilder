@@ -30,9 +30,4 @@ class BuilderFactory
                 new Exception('Неизвестный тип подключения');
         }
     }
-
-    public function getDriver()
-    {
-        return $this->driver;
-    }
 }

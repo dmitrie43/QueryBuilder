@@ -13,7 +13,6 @@ abstract class QueryBuilder
     protected $limit;
     protected $orderBy;
     protected $connect;
-    protected $wrapped;
     protected $andWhere;
     protected $orWhere;
 
@@ -52,43 +51,27 @@ abstract class QueryBuilder
             exit('Знак в WHERE неверен');
         }
     }
-    //Проверка драйвера
-    private function checkDriver($column) {
-        $driver = new BuilderFactory();
-        $wrapped = '';
-        switch ($driver->getDriver()) {
-            case $driver->mysql:
-                $db = new MysqlBuilder();
-                $wrapped = $db->wrap($column);
-                break;
-            case $driver->pg:
-                $db = new PgBuilder();
-                $wrapped = $db->wrap($column);
-                break;
-        }
-        $this->wrapped = $wrapped;
-    }
 
     public function where($column = '', $cond = '=', $value = '') {
         $this->checkWhere($column, $cond, $value);
-        $this->checkDriver($column);
-        $where = rtrim(" WHERE $this->wrapped $cond \"$value\"");
+        $wrapped = $this->wrap($column);
+        $where = rtrim(" WHERE $wrapped $cond \"$value\"");
         $this->where = $where;
         return $this;
     }
 
     public function andWhere($column = '', $cond = '', $value = '') {
         $this->checkWhere($column, $cond, $value);
-        $this->checkDriver($column);
-        $where = rtrim(" AND $this->wrapped $cond \"$value\"");
+        $wrapped = $this->wrap($column);
+        $where = rtrim(" AND $wrapped $cond \"$value\"");
         $this->andWhere = $where;
         return $this;
     }
 
     public function orWhere($column = '', $cond = '', $value = '') {
         $this->checkWhere($column, $cond, $value);
-        $this->checkDriver($column);
-        $where = rtrim(" OR $this->wrapped $cond \"$value\"");
+        $wrapped = $this->wrap($column);
+        $where = rtrim(" OR $wrapped $cond \"$value\"");
         $this->orWhere = $where;
         return $this;
     }
