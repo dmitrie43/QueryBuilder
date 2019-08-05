@@ -64,7 +64,8 @@ abstract class QueryBuilder
     public function andWhere($column = '', $cond = '', $value = '') {
         $this->checkWhere($column, $cond, $value);
         $wrapped = $this->wrap($column);
-        $where = rtrim(" AND $wrapped $cond \"$value\"");
+        $value = var_export($value, true);
+        $where = rtrim(" AND $wrapped $cond $value");
         $this->andWhere = $where;
         return $this;
     }
@@ -72,7 +73,8 @@ abstract class QueryBuilder
     public function orWhere($column = '', $cond = '', $value = '') {
         $this->checkWhere($column, $cond, $value);
         $wrapped = $this->wrap($column);
-        $where = rtrim(" OR $wrapped $cond \"$value\"");
+        $value = var_export($value, true);
+        $where = rtrim(" OR $wrapped $cond $value");
         $this->orWhere = $where;
         return $this;
     }
